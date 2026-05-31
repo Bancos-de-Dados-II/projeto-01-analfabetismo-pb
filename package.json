@@ -1,0 +1,26 @@
+{
+  "name": "projeto-01-analfabetismo-pb",
+  "version": "1.0.0",
+  "description": "[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/CCuAsM6D)",
+  "main": "server.js",
+"scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bancos-de-Dados-II/projeto-01-analfabetismo-pb.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bancos-de-Dados-II/projeto-01-analfabetismo-pb/issues"
+  },
+  "homepage": "https://github.com/Bancos-de-Dados-II/projeto-01-analfabetismo-pb#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pg": "^8.21.0"
+  }
+}
