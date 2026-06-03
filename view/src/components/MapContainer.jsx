@@ -3,9 +3,8 @@ import { MapContainer as LeafletMap, TileLayer, GeoJSON, useMap } from "react-le
 import "leaflet/dist/leaflet.css";
 
 const PARAIBA_CENTER = [-7.12, -36.72];
-const PARAIBA_ZOOM = 8;
+const PARAIBA_ZOOM = 9;
 
-// MODIFICADO INÍCIO: centro calculado direto da geometria — sem L.geoJSON() que deixa camada fantasma no DOM
 function calcularCentro(geometry) {
   const coords = [];
 
@@ -60,9 +59,19 @@ function FocarMunicipio({ municipioSelecionado, geoJsonData }) {
 
   return null;
 }
-// MODIFICADO FIM
 
-// MODIFICADO INÍCIO: botão de geolocalização via navigator.geolocation
+function FocarEndereco({ coordenadasEndereco }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (coordenadasEndereco) {
+      map.setView(coordenadasEndereco, 12, { animate: true });
+    }
+  }, [coordenadasEndereco, map]);
+
+  return null;
+}
+
 function BotaoGeolocalizacao() {
   const map = useMap();
 
@@ -93,41 +102,40 @@ function BotaoGeolocalizacao() {
     </button>
   );
 }
-// MODIFICADO FIM
 
-// MODIFICADO INÍCIO: escala de cores coroplética por taxa_analfabetismo
 function obterCor(taxa) {
-  if (taxa === undefined || taxa === null) return "#cccccc"; // sem dado → cinza
-  if (taxa < 5) return "#1a9850"; // verde escuro  — muito baixo
-  if (taxa < 10) return "#91cf60"; // verde claro   — baixo
-  if (taxa < 15) return "#fee08b"; // amarelo       — intermediário
-  if (taxa < 20) return "#fc8d59"; // laranja       — alto
-  return "#d73027";        // vermelho      — muito alto (20%+)
+  if (taxa === undefined || taxa === null) return "#cccccc";
+  if (taxa < 5) return "#1a9850";
+  if (taxa < 10) return "#91cf60";
+  if (taxa < 15) return "#fee08b";
+  if (taxa < 20) return "#fc8d59";
+  return "#d73027";
 }
-// MODIFICADO FIM
 
-function MapContainer({ municipioSelecionado, setMunicipioSelecionado }) {
+function MapContainer({
+  municipioSelecionado,
+  setMunicipioSelecionado,
+  coordenadasEndereco,
+  filtroAnalfabetismo,
+  filtroEscolas
+}) {
   const [geoJsonData, setGeoJsonData] = useState(null);
 
   useEffect(() => {
     async function carregarDados() {
       try {
-        // Busca em paralelo: geometrias locais + dados tabulares da API
         const [resGeo, resDados] = await Promise.all([
-          // MODIFICADO: trocado arquivo estático pela rota real do backend
-          fetch("http://localhost:3000/municipios"), // GeoJSON com geometrias
-          fetch("http://localhost:3000/dados"),      // tabular com taxa e escolas
+          fetch("http://localhost:3000/municipios"),
+          fetch("http://localhost:3000/dados"),
         ]);
 
         const geo = await resGeo.json();
         const dados = await resDados.json();
 
-        // Índice dos dados tabulares por code_muni para cruzamento O(1)
         const indiceDados = Object.fromEntries(
           dados.map((d) => [d.code_muni, d])
         );
 
-        // Injeta taxa_analfabetismo e qtd_escolas nas properties de cada feature
         const geoCruzado = {
           ...geo,
           features: geo.features.map((feature) => ({
@@ -148,25 +156,36 @@ function MapContainer({ municipioSelecionado, setMunicipioSelecionado }) {
     carregarDados();
   }, []);
 
-  // MODIFICADO INÍCIO: borda contínua escura no selecionado — sem tracejado azul
   function estiloPadrao(feature) {
-    const selecionado =
-      municipioSelecionado &&
-      feature.properties.code_muni === municipioSelecionado.code_muni;
+    const props = feature.properties;
 
-    const cor = obterCor(feature.properties.taxa_analfabetismo);
+    let atendeAnalfabetismo = true;
+    const taxa = props.taxa_analfabetismo ?? 0;
+    if (filtroAnalfabetismo === "0-5") atendeAnalfabetismo = taxa >= 0 && taxa < 5;
+    else if (filtroAnalfabetismo === "5-10") atendeAnalfabetismo = taxa >= 5 && taxa < 10;
+    else if (filtroAnalfabetismo === "10-15") atendeAnalfabetismo = taxa >= 10 && taxa < 15;
+    else if (filtroAnalfabetismo === "15+") atendeAnalfabetismo = taxa >= 15;
+
+    let atendeEscolas = true;
+    const escolas = props.qtd_escolas ?? 0;
+    if (filtroEscolas === "0-20") atendeEscolas = escolas >= 0 && escolas < 20;
+    else if (filtroEscolas === "20-50") atendeEscolas = escolas >= 20 && escolas < 50;
+    else if (filtroEscolas === "50+") atendeEscolas = escolas >= 50;
+
+    const visivel = atendeAnalfabetismo && atendeEscolas;
+    const selecionado = municipioSelecionado && props.code_muni === municipioSelecionado.code_muni;
+    const cor = obterCor(props.taxa_analfabetismo);
 
     return {
       color: selecionado ? "#222" : "#333",
       weight: selecionado ? 3 : 0.8,
       dashArray: null,
       fillColor: cor,
-      fillOpacity: 0.7,
+      fillOpacity: visivel ? 0.7 : 0,
+      opacity: visivel ? 1 : 0,
     };
   }
-  // MODIFICADO FIM
 
-  // MODIFICADO INÍCIO: tooltip rico unificado — remove popup e tooltip simples anteriores
   function aoClicarFeature(feature, layer) {
     const { nome_municipio, taxa_analfabetismo, qtd_escolas } = feature.properties;
 
@@ -191,7 +210,6 @@ function MapContainer({ municipioSelecionado, setMunicipioSelecionado }) {
       opacity: 1,
     });
   }
-  // MODIFICADO FIM
 
   return (
     <div className="map-placeholder">
@@ -205,7 +223,6 @@ function MapContainer({ municipioSelecionado, setMunicipioSelecionado }) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {/* MODIFICADO: botão de geolocalização adicionado dentro do mapa */}
         <BotaoGeolocalizacao />
 
         <FocarMunicipio
@@ -213,9 +230,11 @@ function MapContainer({ municipioSelecionado, setMunicipioSelecionado }) {
           geoJsonData={geoJsonData}
         />
 
+        <FocarEndereco coordenadasEndereco={coordenadasEndereco} />
+
         {geoJsonData && (
           <GeoJSON
-            key={municipioSelecionado?.code_muni ?? "geojson"}
+            key={`${municipioSelecionado?.code_muni ?? "geojson"}-${filtroAnalfabetismo}-${filtroEscolas}`}
             data={geoJsonData}
             style={estiloPadrao}
             onEachFeature={aoClicarFeature}

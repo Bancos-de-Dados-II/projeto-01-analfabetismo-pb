@@ -11,6 +11,7 @@ function Sidebar({
   municipioSelecionado,
   setMunicipioSelecionado,
   limparFiltros,
+  onCoordenadas,
 }) {
   function handleSelecionar(municipio) {
     if (municipioSelecionado?.code_muni === municipio.code_muni) {
@@ -20,7 +21,6 @@ function Sidebar({
     }
   }
 
-  // Lógica de ativação do botão 'Limpar Filtro'
   const temFiltroAtivo =
     busca !== "" ||
     filtroAnalfabetismo !== "" ||
@@ -63,7 +63,7 @@ function Sidebar({
         <option value="50+">50+</option>
       </select>
 
-      <AddressSearch />
+      <AddressSearch onCoordenadas={onCoordenadas} />
 
       <label>Buscar município</label>
       <input

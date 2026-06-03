@@ -13,6 +13,7 @@ function App() {
   const [filtroAnalfabetismo, setFiltroAnalfabetismo] = useState("");
   const [filtroEscolas, setFiltroEscolas] = useState("");
   const [municipioSelecionado, setMunicipioSelecionado] = useState(null);
+  const [coordenadasEndereco, setCoordenadasEndereco] = useState(null);
 
   useEffect(() => {
     async function carregarDados() {
@@ -30,8 +31,6 @@ function App() {
     carregarDados();
   }, []);
 
-  // Calculo das médias estaduais para comparação nos gráficos
-
   const mediasEstaduais = useMemo(() => {
     if (municipios.length === 0) return { analfabetismo: 0, escolas: 0 };
 
@@ -48,13 +47,13 @@ function App() {
     };
   }, [municipios]);
 
-  // Reseta todos os filtros e a seleção de uma vez só
 
   function limparFiltros() {
     setBusca("");
     setFiltroAnalfabetismo("");
     setFiltroEscolas("");
     setMunicipioSelecionado(null);
+    setCoordenadasEndereco(null);
   }
 
   const municipiosFiltrados = municipios.filter((municipio) => {
@@ -114,7 +113,7 @@ function App() {
   });
 
   return (
-    <>
+    <div className="app-container">
       <Header
         busca={busca}
         setBusca={setBusca}
@@ -132,20 +131,31 @@ function App() {
           municipioSelecionado={municipioSelecionado}
           setMunicipioSelecionado={setMunicipioSelecionado}
           limparFiltros={limparFiltros}
+          onCoordenadas={setCoordenadasEndereco}
         />
 
-        <MapContainer
-          municipioSelecionado={municipioSelecionado}
-          setMunicipioSelecionado={setMunicipioSelecionado}
-        />
+        <main className="main-content">
+          <div className="map-container-wrapper">
+            <MapContainer
+              municipios={municipiosFiltrados}
+              municipioSelecionado={municipioSelecionado}
+              setMunicipioSelecionado={setMunicipioSelecionado}
+              coordenadasEndereco={coordenadasEndereco}
+              filtroAnalfabetismo={filtroAnalfabetismo}
+              filtroEscolas={filtroEscolas}
+            />
+          </div>
+
+          <div className="dashboard-panel-footer">
+            <DashboardPanel
+              municipio={municipioSelecionado}
+              setMunicipioSelecionado={setMunicipioSelecionado}
+              mediasEstaduais={mediasEstaduais}
+            />
+          </div>
+        </main>
       </div>
-
-      <DashboardPanel
-        municipio={municipioSelecionado}
-        setMunicipioSelecionado={setMunicipioSelecionado}
-        mediasEstaduais={mediasEstaduais}
-      />
-    </>
+    </div>
   );
 }
 
