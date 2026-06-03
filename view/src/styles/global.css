@@ -67,7 +67,49 @@ body {
   gap: 16px;
 }
 
-.sidebar select {
+/* SIDEBAR HEADER + BOTÃO LIMPAR */
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-limpar {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  color: #555;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-limpar:hover:not(:disabled) {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.btn-limpar:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ESTADO VAZIO DOS GRÁFICOS */
+
+.graph-vazio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 160px;
+  color: #aaa;
+  font-size: 13px;
+  text-align: center;
+}
+.sidebar select,
+.sidebar input {
   width: 100%;
 
   padding: 10px;
@@ -75,6 +117,36 @@ body {
   border-radius: 8px;
 
   border: 1px solid #ccc;
+}
+
+/* BOTÃO DE GEOLOCALIZAÇÃO */
+
+.btn-geolocalizacao {
+  position: absolute;
+  bottom: 32px;
+  right: 12px;
+  z-index: 1000;
+
+  width: 36px;
+  height: 36px;
+
+  border: 2px solid #ccc;
+  border-radius: 6px;
+
+  background: white;
+
+  font-size: 18px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+
+  transition: box-shadow 0.2s;
+}
+
+.btn-geolocalizacao:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
 }
 
 /* MAPA */
