@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function AddressSearch() {
+function AddressSearch({ onCoordenadas }) {
   const [endereco, setEndereco] = useState("");
   const [coordenadas, setCoordenadas] = useState(null);
   const [erro, setErro] = useState("");
@@ -12,7 +12,7 @@ function AddressSearch() {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
           endereco
-        )}`
+        )}&countrycodes=br&viewbox=-39.0, -8.5, -34.5, -6.0&bounded=1`
       );
 
       const data = await response.json();
@@ -23,12 +23,21 @@ function AddressSearch() {
         return;
       }
 
+      // Convertendo os valores para números flutuantes (float) exigidos pelo Leaflet
+      const latitude = parseFloat(data[0].lat);
+      const longitude = parseFloat(data[0].lon);
+
       setCoordenadas({
-        lat: data[0].lat,
-        lon: data[0].lon,
+        lat: latitude,
+        lon: longitude,
       });
 
-      console.log("Coordenadas:", data[0].lat, data[0].lon);
+      console.log("Coordenadas:", latitude, longitude);
+
+      if (onCoordenadas) {
+        onCoordenadas([latitude, longitude]);
+      }
+
     } catch (error) {
       console.error(error);
       setErro("Erro ao buscar endereço.");

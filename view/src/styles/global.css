@@ -7,21 +7,27 @@
 body {
   font-family: Arial, sans-serif;
   background: #f4f6f8;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* container global que envelopa a aplicação inteira */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
 }
 
 /* HEADER */
-
 .header {
   height: 70px;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   padding: 0 24px;
-
   background: white;
-
   border-bottom: 1px solid #ddd;
 }
 
@@ -33,66 +39,136 @@ body {
 
 .header input {
   width: 320px;
-
   padding: 10px;
-
   border: 1px solid #ccc;
-
   border-radius: 8px;
 }
 
 /* LAYOUT */
-
 .layout {
   display: flex;
-  height: 70vh;
+  height: calc(100vh - 70px);
+  width: 100%;
+  overflow: hidden;
 }
 
 /* SIDEBAR */
-
 .sidebar {
   width: 320px;
-
+  min-width: 320px;
   background: white;
-
   padding: 20px;
-
   border-right: 1px solid #ddd;
-
   overflow-y: auto;
-
   display: flex;
   flex-direction: column;
-
   gap: 16px;
+  height: 100%;
 }
 
-.sidebar select {
-  width: 100%;
+/* SIDEBAR HEADER + BOTÃO LIMPAR */
 
-  padding: 10px;
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
+.btn-limpar {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: 1px solid #ccc;
   border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  color: #555;
+  transition: background 0.2s, color 0.2s;
+}
 
+.btn-limpar:hover:not(:disabled) {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.btn-limpar:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ESTADO VAZIO DOS GRÁFICOS */
+.graph-vazio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 160px;
+  color: #aaa;
+  font-size: 13px;
+  text-align: center;
+}
+
+.sidebar select,
+.sidebar input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
   border: 1px solid #ccc;
 }
 
-/* MAPA */
-
-.map-placeholder {
+/* Bloco da direita que organiza o mapa acima e os gráficos abaixo */
+.main-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
 
+.map-container-wrapper {
+  flex: 1;
+  width: 100%;
+  position: relative;
+}
+
+/* MAPA */
+.map-placeholder {
+  width: 100%;
+  height: 100%;
   background: #eaf0f5;
-
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* LISTA DE MUNICÍPIOS */
+/* BOTÃO DE GEOLOCALIZAÇÃO */
+.btn-geolocalizacao {
+  position: absolute;
+  /* Ajustado para ficar fixado no canto superior ou inferior correto dentro da caixa do mapa */
+  top: 80px;
+  left: 10px;
+  z-index: 1000;
+  width: 34px;
+  height: 34px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  background: white;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
 
+.btn-geolocalizacao:hover {
+  background-color: #f4f4f4;
+}
+
+/* LISTA DE MUNICÍPIOS */
 .municipios-list {
-  max-height: 400px;
+  flex: 1;
   overflow-y: auto;
 }
 
@@ -111,62 +187,57 @@ body {
   background: #f8f9fa;
 }
 
+/* Caixa do Rodapé que envolve o painel de gráficos */
+
+.dashboard-panel-footer {
+  height: 300px;
+  min-height: 300px;
+  background: white;
+  border-top: 1px solid #ddd;
+  overflow-y: auto;
+}
+
 /* PAINEL DE GRÁFICOS */
 
 .dashboard-panel {
   display: grid;
-
   grid-template-columns: 1fr 1fr;
-
   gap: 20px;
-
   padding: 20px;
 }
 
 .card {
   background: white;
-
-  min-height: 220px;
-
+  min-height: 180px;
   padding: 20px;
-
   border-radius: 12px;
-
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #eee;
 }
 
 .address-search {
-  margin-top: 20px;
-
+  margin-top: 5px;
   display: flex;
   flex-direction: column;
-
   gap: 10px;
 }
 
 .address-search input {
   padding: 10px;
-
   border: 1px solid #ccc;
-
   border-radius: 8px;
 }
 
 .address-search button {
   padding: 10px;
-
   border: none;
-
   border-radius: 8px;
-
   cursor: pointer;
 }
 
 .resultado {
   padding: 10px;
-
   border-radius: 8px;
-
   background: #f5f5f5;
 }
 
